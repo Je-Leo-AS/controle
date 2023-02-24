@@ -1,9 +1,9 @@
 #include "TimerOne.h"
-#define SETPOINT 457
+#define SETPOINT 455
 
 
 double input, output, error;
-double dt = 0.01;
+double dt = 0.0001;
 double Kp = 1;
 bool chave = false;
 char inBuffer[4];
@@ -37,8 +37,8 @@ void loop() {
     }else{
       analogWrite(6,0);
     }
-  Serial.print(analogRead(A0)); Serial.print("  "); Serial.println(Kp);
-  delay(dt);
+  Serial.println(analogRead(A0));// Serial.print("  "); Serial.println(Kp);
+  delay(dt*1000);
 
  if (Serial.available() > 0) {   //analisa se há dados na serial 
     Serial.readBytes(inBuffer, 4);  //lê o dado da serial em 3 caracteres ASCII

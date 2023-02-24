@@ -3,28 +3,12 @@ double dt = 0.0001 ; // Intervalo de amostragem em segundos
 bool chave = false;
 double last_error = 0;
 unsigned long last_time;
-
+char inBuffer[4];
 
 void reset_PWM(){
     chave = !chave;
-    delay(500);
 }
-void Dados(){
-  int sensor_value = analogRead(A0);
-  
-  Serial.println(sensor_value);
 
-  // Envia o sinal de controle para o atuador
-  analogWrite(6, 127);
-
-  // Espera o intervalo de amostragem
-  delay(dt * 1000);
-
-  // Armazena o tempo atual para uso no próximo ciclo
-  last_time = millis();
-
-
-}
 void setup() {
   // Configura a porta do PWM para controlar a saída do sinal
   pinMode(6, OUTPUT);
@@ -38,10 +22,14 @@ void setup() {
 
 void loop() {
     if(chave){
-      Dados();
+      analogWrite(6,127);
     }else{
       analogWrite(6,0);
-      Serial.println(analogRead(A0));
-      delay(dt * 1000);
+    }
+    Serial.println(analogRead(A0));
+    delay(dt * 1000);
+    if (Serial.available() > 0) {   //analisa se há dados na serial 
+    Serial.readBytes(inBuffer, 4);  //lê o dado da serial em 3 caracteres ASCII
+    dt = atof(inBuffer);    //converte o valor ASCII lido em um número inteiro  } 
     }
   }

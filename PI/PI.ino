@@ -1,15 +1,17 @@
 #include "TimerOne.h"
 
-double kp = 0.8; // Constante proporcional
-double ki = 50; // Constante integral
+double kp = 0.10;//0.36357869628624995; // Constante proporcional
+double ki = 1000.341559306706; //750 // Constante integral
+
+
 
 double setpoint =  455.0; // Valor desejado
-double error, integral = 0;
+double error, integral, proportional, error_total= 0;
 double last_error = 0;
 
 
 unsigned long last_time;
-double dt = 0.005; ; // Intervalo de amostragem em segundos
+double dt = 0.00001;  // Intervalo de amostragem em segundos
 bool chave = false;
 
 void reset_PWM(){
@@ -23,11 +25,13 @@ void Controle_PI(){
   // Calcula o erro atual
   error = setpoint - sensor_value;
 
+  error_total = error_total + error;
+
   // Calcula a parte proporcional
-  double proportional = kp * error;
+  proportional = kp * error;
 
   // Calcula a parte integral
-  integral = integral + ki * error * dt;
+  integral = error_total*ki ;
 
   // Limita o valor da integral para evitar saturação
   if (integral > 255) {
@@ -52,13 +56,10 @@ void Controle_PI(){
   // Armazena o valor do erro para uso no próximo ciclo
   last_error = error;
 
-  
-
-  // Espera o intervalo de amostragem
-  delay(dt * 1000);
 
   // Armazena o tempo atual para uso no próximo ciclo
   last_time = millis();
+  //ki = ki*dt;
 
 }
 void setup() {
@@ -69,6 +70,7 @@ void setup() {
   Timer1.initialize(3000000); 
   Timer1.setPeriod(3000000);
   Timer1.attachInterrupt(reset_PWM);
+  ki = ki*dt;
 
 }
 
@@ -78,6 +80,7 @@ void loop() {
     }else{
       analogWrite(6,0);
       Serial.println(analogRead(A0));
-      delay(dt * 1000);
+      
     }
+    delay(dt * 1000);
   }
